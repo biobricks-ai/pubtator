@@ -13,7 +13,7 @@ mkdir -p $listpath
 cd $listpath;
 
 # Define the FTP base address
-export ftpbase=""
+export ftpbase="https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTator3/"
 
 # Retrieve the list of files to download from FTP base address
 wget --no-remove-listing $ftpbase
