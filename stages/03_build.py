@@ -15,13 +15,17 @@ if __name__ == "__main__":
 
     for f in biocxml_in.iterdir():
         with open(f, "rb") as xml:
-            df = pd.read_xml(
-                xml,
-                iterparse={
-                    "document": ["id", "infon", "passage", "relation"],
-                    "collection": ["source", "date", "key", "infon", "document"],
-                    "passage": ["infon", "offset", "relation"],
-                    "annotation": ["infon", "location", "text"]
-                },
-            )
-            df.to_parquet(biocxml_out / f"{f.name}.parquet")
+            try:
+                df = pd.read_xml(
+                    xml,
+                    iterparse={ # must use iterparse here or Pandas runs out of memory
+                        # schema described here: https://ftp.ncbi.nlm.nih.gov/pub/wilbur/BioC-PMC/BioC.dtd
+                        "document": ["id", "infon", "passage", "relation"],
+                        "collection": ["source", "date", "key", "infon", "document"],
+                        "passage": ["infon", "offset", "relation"],
+                        "annotation": ["infon", "location", "text"]
+                    },
+                )
+                df.to_parquet(biocxml_out / f"{f.name}.parquet")
+            except Exception as e:
+                print(e)

@@ -25,11 +25,16 @@ stages:
     outs:
       - raw
   build: 
-    cmd: stages/03_build.sh
+    cmd: python3 stages/03_build.py
     deps:
-      - stages/03_build.sh
-      - stages/csv2parquet.sh
+      - stages/03_build.py
       - raw
-      - list
+    outs:
+      - brick
+  process-csv:
+    cmd: bash stages/04_process_csv.sh
+    deps:
+      - stages/04_process_csv.sh
+      - raw
     outs:
       - brick

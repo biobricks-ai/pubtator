@@ -1,2 +1,43 @@
 schema: '2.0'
-stages: {}
+stages:
+  download:
+    cmd: stages/01_download.sh
+    deps:
+    - path: stages/01_download.sh
+      hash: md5
+      md5: 49baf2e335e4463cb7038fb93de77d84
+      size: 893
+    outs:
+    - path: download
+      hash: md5
+      md5: b65af90b6f13359f6ab08b84870c81ca.dir
+      size: 157166099844
+      nfiles: 19
+    - path: list
+      hash: md5
+      md5: 6244a56d31ddfb8059480e4515cb370a.dir
+      size: 356
+      nfiles: 1
+  unzip:
+    cmd: stages/02_unzip.sh
+    deps:
+    - path: download
+      hash: md5
+      md5: b65af90b6f13359f6ab08b84870c81ca.dir
+      size: 157166099844
+      nfiles: 19
+    - path: list
+      hash: md5
+      md5: 6244a56d31ddfb8059480e4515cb370a.dir
+      size: 356
+      nfiles: 1
+    - path: stages/02_unzip.sh
+      hash: md5
+      md5: e1a79446f6a93ff27b1613b6c4a66546
+      size: 778
+    outs:
+    - path: raw
+      hash: md5
+      md5: c1b6f1109bdf1a096bccfe657f10ab57.dir
+      size: 875625180907
+      nfiles: 92342
