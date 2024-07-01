@@ -14,5 +14,14 @@ if __name__ == "__main__":
         biocxml_out.mkdir(parents=True)
 
     for f in biocxml_in.iterdir():
-        df = pd.read_xml(f, iterparse={"document": ["annotation", "relation", "infon"]})
-        df.to_parquet(biocxml_out / f"{f.name}.parquet")
+        with open(f, "rb") as xml:
+            df = pd.read_xml(
+                xml,
+                iterparse={
+                    "document": ["id", "infon", "passage", "relation"],
+                    "collection": ["source", "date", "key", "infon", "document"],
+                    "passage": ["infon", "offset", "relation"],
+                    "annotation": ["infon", "location", "text"]
+                },
+            )
+            df.to_parquet(biocxml_out / f"{f.name}.parquet")
