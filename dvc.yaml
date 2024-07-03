@@ -36,5 +36,4 @@ stages:
     deps:
       - stages/04_process_csv.sh
       - raw
-    outs:
       - brick
