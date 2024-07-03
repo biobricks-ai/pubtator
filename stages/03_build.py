@@ -1,3 +1,4 @@
+from lxml import etree
 import pandas as pd
 from pathlib import Path
 
@@ -7,6 +8,16 @@ brick_dir = Path("brick")
 biocxml_in = raw_dir / "output/BioCXML"
 biocxml_out = brick_dir / "BioCXML"
 
+parser = etree.XMLParser(huge_tree=True)
+
+
+def parse_element(element):
+    element_dict = {
+        element.tag: element.text,
+    }
+    element_dict["children"] = [parse_element(child) for child in element]
+    return element_dict
+
 
 if __name__ == "__main__":
 
@@ -15,17 +26,15 @@ if __name__ == "__main__":
 
     for f in biocxml_in.iterdir():
         with open(f, "rb") as xml:
-            try:
-                df = pd.read_xml(
-                    xml,
-                    iterparse={ # must use iterparse here or Pandas runs out of memory
-                        # schema described here: https://ftp.ncbi.nlm.nih.gov/pub/wilbur/BioC-PMC/BioC.dtd
-                        "document": ["id", "infon", "passage", "relation"],
-                        "collection": ["source", "date", "key", "infon", "document"],
-                        "passage": ["infon", "offset", "relation"],
-                        "annotation": ["infon", "location", "text"]
-                    },
-                )
-                df.to_parquet(biocxml_out / f"{f.name}.parquet")
-            except Exception as e:
-                print(e)
+            parsed_elements = []
+            for event, element in etree.iterparse(xml, events=("end",)):
+                if element.tag == "collection":
+                    parsed_elements.append(parse_element(element))
+                    # Clear the element from memory
+                    element.clear()
+                    while element.getprevious() is not None:
+                        del element.getparent()[0]
+            df = pd.DataFrame.from_records(parsed_elements)
+            out_path = Path(f.name)
+            df.to_parquet(biocxml_out / out_path.with_suffix(".parquet"))
+            print(f"done parsing file: {f.name}")
