@@ -17,8 +17,7 @@ export ftpbase="https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTator3/"
 
 # Retrieve the list of files to download from FTP base address
 wget --no-remove-listing $ftpbase
-cat index.html | grep -Po '(?<=href=")[^"]*' | sort | cut -d "/" -f 10 > files.txt
-rm .listing
+cat index.html | grep -Po '(?<=href=")[^"]+\.gz' | sort | cut -d "/" -f 10 > downloaded_files.txt
 rm index.html
 
 # Create the download directory
@@ -28,7 +27,7 @@ mkdir -p "$downloadpath"
 cd $downloadpath;
 
 # Download files in parallel
-cat $listpath/files.txt | xargs -P14 -n1 bash -c '
+cat $listpath/downloaded_files.txt | xargs -P11 -n1 bash -c '
   echo $0
   wget -nH -q -nc -P $downloadpath $ftpbase$0
 '

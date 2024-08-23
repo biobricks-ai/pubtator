@@ -15,25 +15,23 @@ stages:
       - stages/01_download.sh
     outs:
       - download
-      - list
+      - list/downloaded_files.txt
   unzip: 
     cmd: stages/02_unzip.sh
     deps:
       - stages/02_unzip.sh
+      - list/downloaded_files.txt
       - download
-      - list
     outs:
       - raw
+      - list/raw_files.txt
   build: 
-    cmd: python3 stages/03_build.py
+    cmd: stages/03_build.sh
     deps:
-      - stages/03_build.py
+      - stages/03_build.sh
+      - stages/build_tsv.py
+      - stages/build_xml.py
+      - list/raw_files.txt
       - raw
     outs:
-      - brick
-  process-csv:
-    cmd: bash stages/04_process_csv.sh
-    deps:
-      - stages/04_process_csv.sh
-      - raw
       - brick
